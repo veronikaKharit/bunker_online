@@ -1,0 +1,361 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Создание игры с уведомлением</title>
+<style>
+  body, html {
+    margin: 0; padding: 0;
+    height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: url(fon/MV5BNTgzMDIyNTI4M15BMl5BanBnXkFtZTgwMzk4MzMyMDI@._V1_.jpg) no-repeat center center fixed;
+    background-size: cover;
+    overflow: hidden;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(30,10,5,0.7);
+    backdrop-filter: blur(6px);
+    z-index: -1;
+  }
+  header {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: rgba(30,10,5,0.8);
+    color: #fff;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.7);
+    z-index: 10;
+    backdrop-filter: saturate(150%) blur(10px);
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 28px;
+    text-shadow: 0 1px 6px rgba(0,0,0,0.8);
+  }
+  header button {
+    position: absolute;
+    right: 30px;
+    background: #d84315;
+    border: none;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.3s ease;
+    box-shadow: 0 2px 6px rgba(216,67,21,0.7);
+  }
+  header button:hover {
+    background: #bf360c;
+  }
+  .create-game-container {
+    margin: 130px auto 40px;
+    max-width: 500px;
+    background: rgba(20,10,5,0.75);
+    border-radius: 20px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.9);
+    padding: 30px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    user-select: text;
+    color: #f5f5f5;
+    border-top: 2px solid rgba(216,67,21,0.7);
+    border-bottom: 2px solid rgba(216,67,21,0.7);
+    min-height: 200px;
+    max-height: none;
+  }
+  label {
+    font-weight: 600;
+    font-size: 18px;
+  }
+  input[type="text"] {
+    padding: 10px 15px;
+    font-size: 18px;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+    background: rgba(70, 30, 20, 0.8);
+    color: #ffccbc;
+    box-shadow: inset 0 0 8px rgba(216,67,21,0.8);
+    transition: background 0.3s, color 0.3s;
+  }
+  input[type="text"]:focus {
+    background: rgba(90, 40, 25, 1);
+    color: #ffe0cc;
+  }
+  button {
+    background: #d84315;
+    border: none;
+    color: white;
+    font-weight: 700;
+    font-size: 18px;
+    padding: 12px 0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    box-shadow: 0 4px 8px rgba(216,67,21,0.9);
+  }
+  button:disabled {
+    background: #772a12;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  button:hover:not(:disabled) {
+    background: #bf360c;
+  }
+  .game-code-label {
+    text-align: center;
+    font-weight: 700;
+    font-size: 16px;
+    color: #ffab91;
+    margin-top: 10px;
+    user-select: none;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+  }
+  .game-code {
+    font-size: 36px;
+    font-weight: 900;
+    color: #ffab91;
+    letter-spacing: 6px;
+    text-align: center;
+    text-shadow: 0 2px 6px rgba(216,67,21,0.8);
+    user-select: all;
+    margin-top: 4px;
+  }
+  .players-list {
+    margin-top: 20px;
+    background: rgba(50,15,10,0.7);
+    padding: 15px 20px;
+    border-radius: 12px;
+    min-height: 100px;
+    max-height: 200px;
+    overflow-y: auto;
+    color: #ffccbc;
+    font-weight: 600;
+    box-shadow: inset 0 0 15px rgba(216,67,21,0.7);
+  }
+  .players-list p {
+    margin: 6px 0;
+  }
+  footer {
+    text-align: center;
+    padding: 15px 10px;
+    background: rgba(30,10,5,0.85);
+    color: #f3e5f5;
+    font-size: 14px;
+    user-select: none;
+    box-shadow: 0 -2px 12px rgba(216,67,21,0.9);
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    margin-top: auto;
+  }
+
+  /* Модальное затемнение фона */
+  #modal-overlay {
+    display: none;
+    position: fixed;
+    top:0; left:0; right:0; bottom:0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(3px);
+    z-index: 10000;
+  }
+
+  /* Модальное окно уведомления */
+  #notification {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #4a2c1a; /* мягкий тёмно-персиковый */
+    color: #ffe6cc;
+    padding: 30px 50px;
+    border-radius: 18px;
+    box-shadow: 0 0 25px rgba(255, 176, 123, 0.9);
+    font-size: 22px;
+    font-weight: 700;
+    z-index: 11000;
+    max-width: 90%;
+    text-align: center;
+    user-select: none;
+    white-space: pre-line; /* для переносов строк */
+  }
+  #notification:hover {
+    cursor: pointer;
+    box-shadow: 0 0 40px rgba(255,176,123,1);
+  }
+</style>
+</head>
+<body>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Создание игры с уведомлением</title>
+<style>
+  /* Стиль остается таким же, как у вас */
+  /* Для удобства не дублирую весь стиль, он остался прежним */
+  /* .... */
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Создание игры</h1>
+  <button onclick="history.back()" title="Назад">←</button>
+</header>
+
+<div class="create-game-container">
+  <label for="player-name">Введите ваше имя:</label>
+  <input type="text" id="player-name" placeholder="Ваше имя" maxlength="20" />
+
+  <button id="create-room-btn" onclick="createGame()">Создать комнату</button>
+
+  <div id="game-code-label" class="game-code-label" style="display:none;">Код игры для остальных игроков:</div>
+  <div id="game-code" class="game-code" style="display:none;"></div>
+
+  <div id="players-list" class="players-list" style="display:none;"></div>
+
+  <button id="start-game-btn" disabled style="display:none;" onclick="startGame()">Начать игру</button>
+</div>
+
+<footer>
+  Игру «Бункер Онлайн» разработали Анучина Алена, Белослудцева Ксения, Харитонова Вероника в рамках своего обучения в НИУ ВШЭ-Пермь, 2025 год.
+</footer>
+
+<!-- Модальное затемнение и уведомление -->
+<div id="modal-overlay"></div>
+<div id="notification"></div>
+
+<script>
+  function generateGameCode() {
+    const letters = 'АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЩЭЮЯ0123456789';
+    let code = '';
+    for (let i = 0; i < 8; i++) {
+      code += letters.charAt(Math.floor(Math.random() * letters.length));
+    }
+    return code;
+  }
+
+  const players = [];
+  const gameCodeElem = document.getElementById('game-code');
+  const gameCodeLabel = document.getElementById('game-code-label');
+  const playersListElem = document.getElementById('players-list');
+  const startGameBtn = document.getElementById('start-game-btn');
+
+  const modalOverlay = document.getElementById('modal-overlay');
+  const notification = document.getElementById('notification');
+
+  function updatePlayersList() {
+    if (players.length === 0) {
+      playersListElem.style.display = 'none';
+      startGameBtn.style.display = 'none';
+      startGameBtn.disabled = true;
+      return;
+    }
+    playersListElem.style.display = 'block';
+    playersListElem.innerHTML = '';
+    players.forEach((p, i) => {
+      const pElem = document.createElement('p');
+      pElem.textContent = (i + 1) + '. ' + p;
+      playersListElem.appendChild(pElem);
+    });
+
+    startGameBtn.style.display = 'block';
+    startGameBtn.disabled = players.length < 1;
+  }
+
+  function createGame() {
+    const playerNameInput = document.getElementById('player-name');
+    const playerName = playerNameInput.value.trim();
+    if (!playerName) {
+      alert('Пожалуйста, введите имя');
+      return;
+    }
+    players.length = 0;
+    players.push(playerName);
+
+    // Генерируем уникальный код игры
+    const code = generateGameCode();
+    // Сохраняем код игры в localStorage
+    localStorage.setItem('gameCode', code);
+    localStorage.setItem('players', JSON.stringify(players));
+
+    gameCodeLabel.style.display = 'block';
+    gameCodeElem.textContent = code;
+    gameCodeElem.style.display = 'block';
+
+    updatePlayersList();
+
+    // Переход на страницу игры
+    window.open('game.html', '_blank'); // Новая вкладка с игрой
+  }
+
+  function startGame() {
+    // Формируем текст с переносами строк
+    const message =
+      'Игра стартует с игроками:\n' +
+      players.map((p, i) => (i + 1) + '. ' + p).join('\n') +
+      '\n\nКод игры:\n' + gameCodeElem.textContent;
+
+    showNotification(message);
+  }
+
+  function showNotification(message, duration = 4000) {
+    notification.textContent = message;
+    notification.style.display = 'block';
+    modalOverlay.style.display = 'block';
+
+    function hide() {
+      notification.style.display = 'none';
+      modalOverlay.style.display = 'none';
+      notification.removeEventListener('click', hide);
+      modalOverlay.removeEventListener('click', hide);
+    }
+
+    notification.addEventListener('click', hide);
+    modalOverlay.addEventListener('click', hide);
+
+    setTimeout(hide, duration);
+  }
+
+  // Загружаем список игроков из localStorage на странице игры
+  window.addEventListener('load', () => {
+    const gameCode = localStorage.getItem('gameCode');
+    const playersList = JSON.parse(localStorage.getItem('players'));
+
+    // Проверяем код игры
+    if (gameCode && playersList) {
+      alert(`Вы вошли в игру с кодом: ${gameCode}`);
+      const playersListElem = document.getElementById('players-list');
+      playersListElem.style.display = 'block';
+      playersListElem.innerHTML = '';
+      playersList.forEach((player, i) => {
+        const pElem = document.createElement('p');
+        pElem.textContent = (i + 1) + '. ' + player;
+        playersListElem.appendChild(pElem);
+      });
+    }
+  });
+</script>
+
+</body>
+</html>

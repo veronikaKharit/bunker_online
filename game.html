@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Игра Бункер</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="game-container">
+    <h1>Игра началась!</h1>
+    <button onclick="window.location.href='rules.html'">Правила игры</button>
+    <button onclick="endGame()">Закончить игру</button>
+
+    <table>
+      <tr>
+        <th>Игрок</th>
+        <th>Профессия</th>
+        <th>Здоровье</th>
+        <th>Факт 1</th>
+        <th>Факт 2</th>
+        <th>Спец. возможности</th>
+      </tr>
+      <tr>
+        <td>Игрок 1</td>
+        <td>Медик</td>
+        <td>100</td>
+        <td>Факт 1</td>
+        <td>Факт 2</td>
+        <td>Лечить</td>
+      </tr>
+      <!-- Добавь больше строк для других игроков -->
+    </table>
+  </div>
+  <script src="script.js"></script>
+  <script>
+    function endGame() {
+      alert('Игра завершена!');
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>

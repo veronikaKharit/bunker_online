@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Бункер Онлайн</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body, html {
+      margin: 0; padding: 0;
+      height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: url(fon/MV5BNTgzMDIyNTI4M15BMl5BanBnXkFtZTgwMzk4MzMyMDI@._V1_.jpg) no-repeat center center fixed;
+      background-size: cover;
+      overflow: hidden;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(30,10,5,0.7);
+      backdrop-filter: blur(6px);
+      z-index: -1;
+    }
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background: rgba(30,10,5,0.8);
+      color: #fff;
+      padding: 15px 30px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.7);
+      z-index: 10;
+      backdrop-filter: saturate(150%) blur(10px);
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.8);
+    }
+    header button {
+      position: absolute;
+      right: 30px;
+      background: #d84315;
+      border: none;
+      color: white;
+      padding: 8px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s ease;
+      box-shadow: 0 2px 6px rgba(216,67,21,0.7);
+    }
+    header button:hover {
+      background: #bf360c;
+    }
+    .create-game-container {
+      margin: 130px auto 40px;
+      max-width: 500px;
+      background: rgba(20,10,5,0.75);
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.9);
+      padding: 30px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      user-select: text;
+      color: #f5f5f5;
+      border-top: 2px solid rgba(216,67,21,0.7);
+      border-bottom: 2px solid rgba(216,67,21,0.7);
+      min-height: 200px;
+      max-height: none;
+    }
+    label {
+      font-weight: 600;
+      font-size: 18px;
+    }
+    input[type="text"] {
+      padding: 10px 15px;
+      font-size: 18px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      width: 100%;
+      box-sizing: border-box;
+      background: rgba(70, 30, 20, 0.8);
+      color: #ffccbc;
+      box-shadow: inset 0 0 8px rgba(216,67,21,0.8);
+      transition: background 0.3s, color 0.3s;
+    }
+    input[type="text"]:focus {
+      background: rgba(90, 40, 25, 1);
+      color: #ffe0cc;
+    }
+    button {
+      background: #d84315;
+      border: none;
+      color: white;
+      font-weight: 700;
+      font-size: 26px;
+      padding: 17px 3; /* Сделал кнопки чуть шире */
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      box-shadow: 0 4px 8px rgba(216,67,21,0.9);
+    }
+    button:disabled {
+      background: #772a12;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+    button:hover:not(:disabled) {
+      background: #bf360c;
+    }
+    /* Контейнер для входа в игру скрыт по умолчанию */
+    .login-container {
+      display: none;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .game-code-label {
+      text-align: center;
+      font-weight: 700;
+      font-size: 16px;
+      color: #ffab91;
+      margin-top: 10px;
+      user-select: none;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+    }
+    .game-code {
+      font-size: 36px;
+      font-weight: 900;
+      color: #ffab91;
+      letter-spacing: 6px;
+      text-align: center;
+      text-shadow: 0 2px 6px rgba(216,67,21,0.8);
+      user-select: all;
+      margin-top: 4px;
+    }
+    .players-list {
+      margin-top: 20px;
+      background: rgba(50,15,10,0.7);
+      padding: 15px 20px;
+      border-radius: 12px;
+      min-height: 100px;
+      max-height: 200px;
+      overflow-y: auto;
+      color: #ffccbc;
+      font-weight: 600;
+      box-shadow: inset 0 0 15px rgba(216,67,21,0.7);
+    }
+    .players-list p {
+      margin: 6px 0;
+    }
+    footer {
+      text-align: center;
+      padding: 15px 10px;
+      background: rgba(30,10,5,0.85);
+      color: #f3e5f5;
+      font-size: 14px;
+      user-select: none;
+      box-shadow: 0 -2px 12px rgba(216,67,21,0.9);
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
+      margin-top: auto;
+    }
+
+    /* Модальное затемнение фона */
+    #modal-overlay {
+      display: none;
+      position: fixed;
+      top:0; left:0; right:0; bottom:0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(3px);
+      z-index: 10000;
+    }
+
+    /* Модальное окно уведомления */
+    #notification {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #4a2c1a; /* мягкий тёмно-персиковый */
+      color: #ffe6cc;
+      padding: 30px 50px;
+      border-radius: 18px;
+      box-shadow: 0 0 25px rgba(255, 176, 123, 0.9);
+      font-size: 22px;
+      font-weight: 700;
+      z-index: 11000;
+      max-width: 90%;
+      text-align: center;
+      user-select: none;
+      white-space: pre-line; /* для переносов строк */
+    }
+    #notification:hover {
+      cursor: pointer;
+      box-shadow: 0 0 40px rgba(255,176,123,1);
+    }
+
+    /* Стиль для ошибки */
+    .error-notification {
+      background: #d32f2f; /* Красный фон */
+      color: #fff;
+      box-shadow: 0 0 20px rgba(211, 47, 47, 0.7);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="welcome-container">
+    <h1>Добро пожаловать в игру Бункер</h1>
+    <button onclick="window.location.href='rules.html'">Правила игры</button>
+    <button onclick="window.location.href='create-game.html'">Создать игру</button>
+    <button onclick="showLoginContainer()">Войти в игру</button>
+  
+    <!-- Контейнер для ввода имени и кода игры -->
+    <div class="login-container" id="login-container">
+      <label for="player-name">Введите ваше имя:</label>
+      <input type="text" id="player-name" placeholder="Ваше имя" maxlength="20" />
+      <label for="game-code">Введите код игры:</label>
+      <input type="text" id="game-code" placeholder="Код игры" maxlength="8" />
+      <button onclick="joinGame()">Войти в игру</button>
+    </div>
+  </div>
+
+  <footer>
+    Игру «Бункер Онлайн» разработали Анучина Алена, Белослудцева Ксения, Харитонова Вероника в рамках своего обучения в НИУ ВШЭ-Пермь, 2025 год.
+  </footer>
+
+  <!-- Модальные окна -->
+  <div id="modal-overlay"></div>
+  <div id="notification"></div>
+
+  <script>
+    function showLoginContainer() {
+      document.getElementById('login-container').style.display = 'flex';
+    }
+
+    function joinGame() {
+      const playerName = document.getElementById('player-name').value.trim();
+      const gameCode = document.getElementById('game-code').value.trim();
+
+      if (!playerName || !gameCode) {
+        showErrorNotification("Пожалуйста, заполните все поля");
+        return;
+      }
+
+      const createdGameCode = 'ABCDE123'; // Пример кода игры
+      if (gameCode === createdGameCode) {
+        showNotification(`Ожидаем остальных игроков...\nТекущий игрок: ${playerName}`, 5000);
+      } else {
+        showErrorNotification("Неверный код игры");
+      }
+    }
+
+    function showNotification(message, duration = 5000) {
+      const notif = document.getElementById('notification');
+      const overlay = document.getElementById('modal-overlay');
+      notif.textContent = message;
+      notif.classList.remove('error-notification');
+      notif.style.display = 'block';
+      overlay.style.display = 'block';
+
+      function hide() {
+        notif.style.display = 'none';
+        overlay.style.display = 'none';
+      }
+
+      setTimeout(hide, duration);
+    }
+
+    function showErrorNotification(message, duration = 5000) {
+      const notif = document.getElementById('notification');
+      const overlay = document.getElementById('modal-overlay');
+      notif.textContent = message;
+      notif.classList.add('error-notification');
+      notif.style.display = 'block';
+      overlay.style.display = 'block';
+
+      function hide() {
+        notif.style.display = 'none';
+        overlay.style.display = 'none';
+      }
+
+      setTimeout(hide, duration);
+    }
+  </script>
+
+</body>
+</html>
+
+

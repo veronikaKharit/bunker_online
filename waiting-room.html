@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ожидание игроков</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="waiting-room-container">
+    <h1>Ожидание игроков</h1>
+
+    <div id="login-section">
+      <label for="player-name">Введите ваше имя:</label>
+      <input type="text" id="player-name" placeholder="Ваше имя">
+      <label for="game-code">Введите код игры:</label>
+      <input type="text" id="game-code" placeholder="Код игры">
+      <button onclick="joinGame()">Войти в игру</button>
+    </div>
+
+    <div id="waiting-section" style="display: none;">
+      <p>Вы вошли в игру как: <span id="player-name-display"></span></p>
+      <p>Ожидаем других игроков...</p>
+      <button onclick="startGame()">Начать игру</button>
+    </div>
+  </div>
+  <script src="script.js">
+    function joinGame() {
+      const playerName = document.getElementById('player-name').value;
+      const gameCode = document.getElementById('game-code').value;
+
+      if (playerName && gameCode) {
+        // Сохраняем имя и код игры в localStorage
+        localStorage.setItem('playerName', playerName);
+        localStorage.setItem('gameCode', gameCode);
+
+        // Переходим на экран ожидания
+        document.getElementById('login-section').style.display = 'none';
+        document.getElementById('waiting-section').style.display = 'block';
+        
+        // Отображаем имя игрока
+        document.getElementById('player-name-display').textContent = playerName;
+      } else {
+        alert('Пожалуйста, заполните все поля!');
+      }
+    }
+
+    function startGame() {
+      alert('Игра началась!');
+      window.location.href = 'game.html'; // Переход к странице игры
+    }
+
+    window.onload = function() {
+  const playerName = localStorage.getItem('playerName');
+  const gameCode = localStorage.getItem('gameCode');
+  
+  if (playerName && gameCode) {
+    document.getElementById('player-name-display').textContent = playerName;
+  } else {
+    alert('Пожалуйста, войдите в игру');
+    window.location.href = 'index.html'; // Переходим на главную страницу
+  }
+};
+
+  </script>
+</body>
+</html>
