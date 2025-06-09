@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Создание игры с уведомлением</title>
+<title>Создание игры</title>
 <style>
   body, html {
     margin: 0; padding: 0;
@@ -17,6 +16,28 @@
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+  }
+  #notification {
+    position: fixed;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(216, 67, 21, 0.9);
+    color: #fff3e0;
+    padding: 20px 40px;
+    border-radius: 15px;
+    box-shadow: 0 0 20px rgba(216,67,21,0.8);
+    font-size: 20px;
+    font-weight: 700;
+    z-index: 10000;
+    text-align: center;
+    user-select: none;
+    cursor: pointer;
+    max-width: 80%;
+  }
+  #notification:hover {
+    background: rgba(216, 67, 21, 1);
+    box-shadow: 0 0 30px rgba(216,67,21,1);
   }
   body::before {
     content: "";
@@ -166,58 +187,10 @@
     border-top-right-radius: 12px;
     margin-top: auto;
   }
-
-  /* Модальное затемнение фона */
-  #modal-overlay {
-    display: none;
-    position: fixed;
-    top:0; left:0; right:0; bottom:0;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(3px);
-    z-index: 10000;
-  }
-
-  /* Модальное окно уведомления */
-  #notification {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: #4a2c1a; /* мягкий тёмно-персиковый */
-    color: #ffe6cc;
-    padding: 30px 50px;
-    border-radius: 18px;
-    box-shadow: 0 0 25px rgba(255, 176, 123, 0.9);
-    font-size: 22px;
-    font-weight: 700;
-    z-index: 11000;
-    max-width: 90%;
-    text-align: center;
-    user-select: none;
-    white-space: pre-line; /* для переносов строк */
-  }
-  #notification:hover {
-    cursor: pointer;
-    box-shadow: 0 0 40px rgba(255,176,123,1);
-  }
 </style>
 </head>
 <body>
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Создание игры с уведомлением</title>
-<style>
-  /* Стиль остается таким же, как у вас */
-  /* Для удобства не дублирую весь стиль, он остался прежним */
-  /* .... */
-</style>
-</head>
-<body>
-
+    <div id="notification" style="display:none;"></div>
 <header>
   <h1>Создание игры</h1>
   <button onclick="history.back()" title="Назад">←</button>
@@ -238,18 +211,14 @@
 </div>
 
 <footer>
-  Игру «Бункер Онлайн» разработали Анучина Алена, Белослудцева Ксения, Харитонова Вероника в рамках своего обучения в НИУ ВШЭ-Пермь, 2025 год.
+  Игру «Бункер Онлайн» разработали тототото, 2025 год.
 </footer>
-
-<!-- Модальное затемнение и уведомление -->
-<div id="modal-overlay"></div>
-<div id="notification"></div>
 
 <script>
   function generateGameCode() {
     const letters = 'АБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЩЭЮЯ0123456789';
     let code = '';
-    for (let i = 0; i < 8; i++) {
+    for(let i=0; i<8; i++) {
       code += letters.charAt(Math.floor(Math.random() * letters.length));
     }
     return code;
@@ -261,11 +230,8 @@
   const playersListElem = document.getElementById('players-list');
   const startGameBtn = document.getElementById('start-game-btn');
 
-  const modalOverlay = document.getElementById('modal-overlay');
-  const notification = document.getElementById('notification');
-
   function updatePlayersList() {
-    if (players.length === 0) {
+    if(players.length === 0) {
       playersListElem.style.display = 'none';
       startGameBtn.style.display = 'none';
       startGameBtn.disabled = true;
@@ -273,31 +239,27 @@
     }
     playersListElem.style.display = 'block';
     playersListElem.innerHTML = '';
-    players.forEach((p, i) => {
+    players.forEach((p,i) => {
       const pElem = document.createElement('p');
-      pElem.textContent = (i + 1) + '. ' + p;
+      pElem.textContent = (i+1) + '. ' + p;
       playersListElem.appendChild(pElem);
     });
 
     startGameBtn.style.display = 'block';
-    startGameBtn.disabled = players.length < 1;
+    startGameBtn.disabled = players.length < 1;//атутутуттутуутутутуттутуутутутутутутутутут
   }
 
   function createGame() {
     const playerNameInput = document.getElementById('player-name');
     const playerName = playerNameInput.value.trim();
-    if (!playerName) {
+    if(!playerName) {
       alert('Пожалуйста, введите имя');
       return;
     }
     players.length = 0;
     players.push(playerName);
 
-    // Генерируем уникальный код игры
     const code = generateGameCode();
-    // Сохраняем код игры в localStorage
-    localStorage.setItem('gameCode', code);
-    localStorage.setItem('players', JSON.stringify(players));
 
     gameCodeLabel.style.display = 'block';
     gameCodeElem.textContent = code;
@@ -305,57 +267,32 @@
 
     updatePlayersList();
 
-    // Переход на страницу игры
-    window.open('game.html', '_blank'); // Новая вкладка с игрой
+    // НЕ очищаем поле имени
+    // playerNameInput.value = '';
   }
+  function showNotification(message, duration = 3000) {
+  const notif = document.getElementById('notification');
+  notif.textContent = message;
+  notif.style.display = 'block';
+
+  function hide() {
+    notif.style.display = 'none';
+    notif.removeEventListener('click', hide);
+  }
+
+  notif.addEventListener('click', hide);
+
+  setTimeout(hide, duration);
+}
 
   function startGame() {
-    // Формируем текст с переносами строк
-    const message =
-      'Игра стартует с игроками:\n' +
-      players.map((p, i) => (i + 1) + '. ' + p).join('\n') +
-      '\n\nКод игры:\n' + gameCodeElem.textContent;
+    showNotification('Игра стартует с игроками: ' + players.join(', ') + '\nКод игры: ' + gameCodeElem.textContent);
 
-    showNotification(message);
   }
-
-  function showNotification(message, duration = 4000) {
-    notification.textContent = message;
-    notification.style.display = 'block';
-    modalOverlay.style.display = 'block';
-
-    function hide() {
-      notification.style.display = 'none';
-      modalOverlay.style.display = 'none';
-      notification.removeEventListener('click', hide);
-      modalOverlay.removeEventListener('click', hide);
-    }
-
-    notification.addEventListener('click', hide);
-    modalOverlay.addEventListener('click', hide);
-
-    setTimeout(hide, duration);
-  }
-
-  // Загружаем список игроков из localStorage на странице игры
-  window.addEventListener('load', () => {
-    const gameCode = localStorage.getItem('gameCode');
-    const playersList = JSON.parse(localStorage.getItem('players'));
-
-    // Проверяем код игры
-    if (gameCode && playersList) {
-      alert(`Вы вошли в игру с кодом: ${gameCode}`);
-      const playersListElem = document.getElementById('players-list');
-      playersListElem.style.display = 'block';
-      playersListElem.innerHTML = '';
-      playersList.forEach((player, i) => {
-        const pElem = document.createElement('p');
-        pElem.textContent = (i + 1) + '. ' + player;
-        playersListElem.appendChild(pElem);
-      });
-    }
-  });
 </script>
 
 </body>
 </html>
+
+
+
